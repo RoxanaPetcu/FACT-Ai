@@ -26,6 +26,8 @@ def get_synthetic_data(*args) -> typing.List[SecretaryInstance]:
         [SecretaryInstance]: List of candidates
     """
     
+    np.random.seed(0)
+    
     colors, probabilities, n = args[0], args[1], args[2]   
     synthetic_data = []
 

@@ -23,7 +23,7 @@ def secretary_experiment(candidates, *args) -> typing.Tuple[typing.Tuple, typing
     colors, probabilities, n = args[0], args[1], args[2]
     thresholds = multiple_color_thresholds(probabilities)
     n_iterations = 20000
-
+    
     for i in range(len(thresholds)):
         thresholds[i] = int(thresholds[i] * sum(n))
 
@@ -34,17 +34,17 @@ def secretary_experiment(candidates, *args) -> typing.Tuple[typing.Tuple, typing
         max_colors[color] = np.max([x.score for x in candidates if x.color == color])
 
     for i in range(n_iterations):
-
+        
         if i % 1000 == 0:
             print(i)
 
         random.shuffle(candidates)
         result_SA = secretary_algorithm(candidates, max_colors)
         results_SA.append(result_SA)
-
+        
         result_SCSA = one_color_secretary_algorithm(candidates, max_colors, colors, probabilities)
         results_SCSA.append(result_SCSA)
-
+    
         result_MCSA = multiple_color_secretary_algorithm(candidates, max_colors, colors, thresholds)
         results_MCSA.append(result_MCSA)
 
@@ -52,11 +52,11 @@ def secretary_experiment(candidates, *args) -> typing.Tuple[typing.Tuple, typing
 
 def synthetic_experiment() -> typing.Tuple:
     """Sets parameters and runs the synthetic data experiment"""
-
+    
     colors = ['red', 'green', 'blue', 'yellow']
     probabilities = [0.25, 0.25, 0.25, 0.25]
     n = [10, 100, 1000, 10000]
-
+    
     synthetic_data = get_synthetic_data(colors, probabilities, n)
     results = secretary_experiment(synthetic_data, colors, probabilities, n)
 
@@ -71,24 +71,24 @@ def unbalanced_synthetic_experiment() -> typing.Tuple:
 
     synthetic_data = get_synthetic_data(colors, probabilities, n)
     results = secretary_experiment(synthetic_data, colors, probabilities, n)
-
+    
     return results
-
+    
 def bank_experiment(path) -> typing.Tuple[typing.Tuple, typing.List[int]]:
     """Sets parameters and runs the feedback maximization experiment
 
     Args:
         path (string): Directory for reading data and writing results
     """
-
+    
     colors = ["under 30", "31-40", "41-50", "51-60", "over 60"]
     probabilities = [0.2, 0.2, 0.2, 0.2, 0.2]
     n = []
 
     bank_data, n = get_bank_data(path, colors, probabilities)
-
+        
     results = secretary_experiment(bank_data, colors, probabilities, n)
-
+    
     return results, n
 
 def pokec_experiment(path_profiles, path_followers) -> typing.Tuple[typing.Tuple, typing.List[int]]:
@@ -100,20 +100,20 @@ def pokec_experiment(path_profiles, path_followers) -> typing.Tuple[typing.Tuple
     """
 
     colors = ["Under", "Normal", "Over", "Obese1", "Obese2"]
-
+    
     probabilities = [0.2, 0.2, 0.2, 0.2, 0.2]
     n = []
 
-    pokec_data, n = get_pokec_data(path_profiles, path_followers, colors, probabilities)
+    # pokec_data, n = get_pokec_data(path_profiles, path_followers, colors, probabilities)
 
-    # with open('data/pokec_dataset.pickle', 'rb') as f:
-    #     pokec_data = pickle.load(f)
+    with open('data/pokec_dataset.pickle', 'rb') as f:
+        pokec_data = pickle.load(f)
 
     for i in range(len(colors)):
         n.append(len([item.color for item in pokec_data if item.color == colors[i]]))
 
     results = secretary_experiment(pokec_data, colors, probabilities, n)
-
+    
     return results, n
 
 def run_experiments():
@@ -122,26 +122,26 @@ def run_experiments():
     Args:
         path (string): Directory for reading data and writing results
     """
-
+    
     results = synthetic_experiment()
     results2 = unbalanced_synthetic_experiment()
     # results3, n_bank = bank_experiment('data/bank_raw.csv')
     # results4, n_pokec = pokec_experiment('data/soc-pokec-profiles.txt', 'data/soc-pokec-relationships.txt')
-
+    
     with open('results/results_synthetic1.pickle', 'wb') as f:
         pickle.dump(results, f)
-
+        
     with open('results/results_synthetic2.pickle', 'wb') as f:
         pickle.dump(results2, f)
-
+        
     # with open('results/results_bank.pickle', 'wb') as f:
     #     pickle.dump(results3, f)
-
+        
     # with open('results/results_bank_args.pickle', 'wb') as f:
     #     pickle.dump(n_bank, f)
-
+        
     # with open('results/results_pokec.pickle', 'wb') as f:
     #     pickle.dump(results4, f)
-
+        
     # with open('results/results_pokec_args.pickle', 'wb') as f:
     #     pickle.dump(n_pokec, f)
